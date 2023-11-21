@@ -13,7 +13,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Nodemailer configuration
-
+app.get("/", (req, res) => {
+  res.send("Welcome to the Email API!");
+});
 // Create a transporter object
 app.post("/send-email", (req, res) => {
   const { to, subject, text } = req.body;
