@@ -1,6 +1,9 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const multer = require("multer");
+const path = require("path");
 const cors = require("cors");
 // Body parser middleware
 const app = express();
@@ -16,6 +19,40 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => {
   res.send("Welcome to the Email API!");
 });
+mongoose
+  .connect(
+    "mongodb+srv://arrehman0r:afsd1423@cluster0.afv3ytm.mongodb.net/?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    console.log("Connected to MongoDB Atlas");
+  })
+  .catch((error) => {
+    console.error("Error connecting to MongoDB Atlas:", error);
+  });
+const Product = require("./models/product");
+
+const Product = mongoose.model("Product", productSchema);
+app.post("/products", async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    await product.save();
+    res.status(201).json(product);
+  } catch (error) {
+    console.error("Error adding product:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    console.error("Error retrieving products:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Create a transporter object
 app.post("/send-email", (req, res) => {
   const { to, subject, text } = req.body;
